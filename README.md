@@ -6,6 +6,10 @@ Another toy/minimal json parser
 
 TODO:
 
+### Running Tests
+
+- `cd test; make; ./thule_test`
+
 ## References
 
 - [Phil Eaton - Writing a Simple JSON Parser](https://notes.eatonphil.com/writing-a-simple-json-parser.html)
