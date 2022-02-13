@@ -4,7 +4,10 @@ Another toy/minimal json parser
 
 ## Usage
 
-TODO:
+```c
+#include "thule.h"
+
+```
 
 ### Running Tests
 

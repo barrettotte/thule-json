@@ -6,13 +6,19 @@
 #include <stdint.h>
 
 typedef enum {
-    JSON_NULL,
-    JSON_BOOL,
-    JSON_NUM,
-    JSON_STR,
-    JSON_ARR,
-    JSON_OBJ
-} json_type;
+    JSON_ERR_NONE,
+    JSON_ERR_ROOT,
+    JSON_ERR_VALSTART,
+} json_error;
+
+typedef enum {
+    JSON_VAL_NULL,
+    JSON_VAL_BOOL,
+    JSON_VAL_NUM,
+    JSON_VAL_STR,
+    JSON_VAL_ARR,
+    JSON_VAL_OBJ
+} json_val_kind;
 
 typedef struct json_val json_val_t;
 typedef struct json_arr json_arr_t;
@@ -32,6 +38,7 @@ struct json_obj {
 };
 
 struct json_val {
+    json_val_kind kind;
     union {
         char* val_str;
         int val_int;
@@ -40,10 +47,10 @@ struct json_val {
         json_arr_t* val_arr;
         json_obj_t* val_obj;
     } val;
-
-    json_type type;
 };
 
-uint8_t json_parse(const char* json_src, const json_obj_t* root);
+/* functions */
+
+uint8_t json_parse(const char* json_src, const json_val_t* root);
 
 #endif
