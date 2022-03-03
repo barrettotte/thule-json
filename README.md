@@ -1,6 +1,6 @@
 # thule-json
 
-Another toy/minimal json parser
+Another toy/minimal json parser that isn't convenient to use at all.
 
 ## Usage
 
@@ -11,7 +11,7 @@ Another toy/minimal json parser
 
 ### Running Tests
 
-- `cd test; make; ./thule_test`
+- `make; ./thule_test`
 
 ## References
 

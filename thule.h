@@ -20,21 +20,21 @@ typedef enum {
     JSON_VAL_OBJ
 } json_val_kind;
 
-typedef struct json_val json_val_t;
-typedef struct json_arr json_arr_t;
-typedef struct json_obj json_obj_t;
+typedef struct json_val json_val;
+typedef struct json_arr json_arr;
+typedef struct json_obj json_obj;
 
 struct json_arr {
-    json_val_t* items;
+    json_val* items;
     size_t length;
     size_t capacity;
 };
 
 struct json_obj {
     char* key;
-    json_val_t* val;
-    json_obj_t* next;
-    json_obj_t* prev;
+    json_val* val;
+    json_obj* next;
+    json_obj* prev;
 };
 
 struct json_val {
@@ -44,13 +44,14 @@ struct json_val {
         int val_int;
         double val_dub;
         bool val_bool;
-        json_arr_t* val_arr;
-        json_obj_t* val_obj;
+        json_arr* val_arr;
+        json_obj* val_obj;
     } val;
 };
 
 /* functions */
 
-uint8_t json_parse(const char* json_src, const json_val_t* root);
+void json_parse(const char* src, json_val* root);
+void json_free(const json_val* root);
 
 #endif
