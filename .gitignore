@@ -1,3 +1,5 @@
 .vscode/
 *.o
-thule_test
+*.out
+
+valgrind-out.txt

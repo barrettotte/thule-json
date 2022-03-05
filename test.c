@@ -3,18 +3,26 @@
 #include <stdlib.h>
 #include "thule.h"
 
-void test_parse_object() {
-    const char* src = "{\"username\": \"barrettotte\", \"age\": 25, \"test\": null}";
-    json_val* root = malloc(sizeof(json_val));
-    json_parse(src, root);
-    
-    assert(root != NULL);
+void test_object_empty() {
+    const char* src = "{}\0";
 
-    json_free(root);
+    json_value* root = json_parse(src);
+    assert(root != NULL);
+    assert(root->kind == JSON_VAL_OBJECT);
+
+    json_object* obj = root->val.v_object;
+    assert(obj != NULL);
+    assert(obj->key == NULL);
+    assert(obj->next == NULL);
+    assert(obj->prev == NULL);
+    // printf("%d\n", obj->val->kind);
+    // assert(obj->val == NULL);
+
+    json_value_free(root);
 }
 
 int main() {
-    test_parse_object();
+    test_object_empty();
 
     return 0;
 }
