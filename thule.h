@@ -41,17 +41,16 @@ struct json_object {
 struct json_value {
     json_val_kind kind;
     union {
-        char*        t_string;
-        long         t_int;
-        double       t_double;
-        bool         t_bool;
-        json_array*  t_array;
-        json_object* t_object;
-    } v;
+        char*        v_string;
+        long         v_int;
+        double       v_double;
+        bool         v_bool;
+        json_array*  v_array;
+        json_object* v_object;
+    };
 };
 
 json_value* json_parse(const char* src);
 void json_value_free(json_value* node);
-void json_value_print(json_value* root);
 
 #endif

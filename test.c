@@ -10,7 +10,7 @@ void test_object_empty() {
     assert(root != NULL);
     assert(root->kind == JSON_VAL_OBJECT);
 
-    json_object* obj = root->v.t_object;
+    json_object* obj = root->v_object;
     assert(obj != NULL);
     assert(obj->key == NULL);
     assert(obj->next == NULL);
@@ -26,11 +26,11 @@ void test_object_basic_1() {
     assert(root != NULL);
     assert(root->kind == JSON_VAL_OBJECT);
 
-    json_object* obj = root->v.t_object;
+    json_object* obj = root->v_object;
     assert(obj != NULL);
     assert(strcmp(obj->key, "username") == 0);
     assert(obj->val->kind == JSON_VAL_STRING);
-    assert(strcmp(obj->val->v.t_string, "barrettotte") == 0);
+    assert(strcmp(obj->val->v_string, "barrettotte") == 0);
     assert(obj->next == NULL);
     assert(obj->prev == NULL);
 
@@ -43,18 +43,18 @@ void test_object_basic_2() {
     assert(root != NULL);
     assert(root->kind == JSON_VAL_OBJECT);
 
-    json_object* obj = root->v.t_object;
+    json_object* obj = root->v_object;
     assert(obj != NULL);
     assert(strcmp(obj->key, "myInt") == 0);
     assert(obj->val->kind == JSON_VAL_INT);
-    assert(obj->val->v.t_int == 123);
+    assert(obj->val->v_int == 123);
     assert(obj->prev == NULL);
     
     obj = obj->next;
     assert(obj != NULL);
     assert(strcmp(obj->key, "myDouble") == 0);
     assert(obj->val->kind == JSON_VAL_DOUBLE);
-    assert(obj->val->v.t_double == 3.14);
+    assert(obj->val->v_double == 3.14);
     assert(obj->prev != NULL);
     assert(obj->next == NULL);
 
@@ -67,18 +67,18 @@ void test_object_basic_3() {
     assert(root != NULL);
     assert(root->kind == JSON_VAL_OBJECT);
 
-    json_object* obj = root->v.t_object;
+    json_object* obj = root->v_object;
     assert(obj != NULL);
     assert(strcmp(obj->key, "myTrue") == 0);
     assert(obj->val->kind == JSON_VAL_BOOL);
-    assert(obj->val->v.t_bool);
+    assert(obj->val->v_bool);
     assert(obj->prev == NULL);
     
     obj = obj->next;
     assert(obj != NULL);
     assert(strcmp(obj->key, "myFalse") == 0);
     assert(obj->val->kind == JSON_VAL_BOOL);
-    assert(!obj->val->v.t_bool);
+    assert(!obj->val->v_bool);
     assert(obj->prev != NULL);
     assert(obj->next != NULL);
 
@@ -86,7 +86,7 @@ void test_object_basic_3() {
     assert(obj != NULL);
     assert(strcmp(obj->key, "myNull") == 0);
     assert(obj->val->kind == JSON_VAL_NULL);
-    assert(obj->val->v.t_int == 0);
+    assert(obj->val->v_int == 0);
     assert(obj->prev != NULL);
     assert(obj->next == NULL);
 
@@ -99,16 +99,16 @@ void test_object_multilevel() {
     assert(root != NULL);
     assert(root->kind == JSON_VAL_OBJECT);
 
-    json_object* rootObj = root->v.t_object;
+    json_object* rootObj = root->v_object;
     assert(rootObj != NULL);
     assert(strcmp(rootObj->key, "user") == 0);
     assert(rootObj->val->kind == JSON_VAL_OBJECT);
 
-    json_object* userObj = rootObj->val->v.t_object;
+    json_object* userObj = rootObj->val->v_object;
     assert(userObj != NULL);
     assert(strcmp(userObj->key, "username") == 0);
     assert(userObj->val->kind == JSON_VAL_STRING);
-    assert(strcmp(userObj->val->v.t_string, "barrettotte") == 0);
+    assert(strcmp(userObj->val->v_string, "barrettotte") == 0);
     assert(userObj->next != NULL);
     assert(userObj->prev == NULL);
 
@@ -116,7 +116,7 @@ void test_object_multilevel() {
     assert(userObj != NULL);
     assert(strcmp(userObj->key, "email") == 0);
     assert(userObj->val->kind == JSON_VAL_STRING);
-    assert(strcmp(userObj->val->v.t_string, "barrettotte@gmail.com") == 0);
+    assert(strcmp(userObj->val->v_string, "barrettotte@gmail.com") == 0);
     assert(userObj->next != NULL);
     assert(userObj->prev != NULL);
 
@@ -124,7 +124,7 @@ void test_object_multilevel() {
     assert(userObj != NULL);
     assert(strcmp(userObj->key, "age") == 0);
     assert(userObj->val->kind == JSON_VAL_INT);
-    assert(userObj->val->v.t_int == 25);
+    assert(userObj->val->v_int == 25);
     assert(userObj->next == NULL);
     assert(userObj->prev != NULL);
 
@@ -136,7 +136,7 @@ void test_array_empty() {
     json_value* root = json_parse(src);
     assert(root != NULL);
     assert(root->kind == JSON_VAL_ARRAY);
-    assert(root->v.t_array->length == 0);
+    assert(root->v_array->length == 0);
     json_value_free(root);
 }
 
@@ -145,10 +145,10 @@ void test_array_basic_1() {
     json_value* root = json_parse(src);
     assert(root != NULL);
     assert(root->kind == JSON_VAL_ARRAY);
-    json_array* arr = root->v.t_array;
+    json_array* arr = root->v_array;
     assert(arr->length == 1);
     assert(arr->items[0]->kind == JSON_VAL_INT);
-    assert(arr->items[0]->v.t_int == 4);
+    assert(arr->items[0]->v_int == 4);
     json_value_free(root);
 }
 
@@ -157,12 +157,12 @@ void test_array_basic_2() {
     json_value* root = json_parse(src);
     assert(root != NULL);
     assert(root->kind == JSON_VAL_ARRAY);
-    json_array* arr = root->v.t_array;
+    json_array* arr = root->v_array;
 
     assert(arr->length == 16);
     for (int i = 0; i < 16; i++) {
         assert(arr->items[i]->kind == JSON_VAL_INT);
-        assert(arr->items[i]->v.t_int == i);
+        assert(arr->items[i]->v_int == i);
     }
     json_value_free(root);
 }
@@ -173,16 +173,16 @@ void test_object_with_array() {
     assert(root != NULL);
     assert(root->kind == JSON_VAL_OBJECT);
 
-    json_object* rootObj = root->v.t_object;
+    json_object* rootObj = root->v_object;
     assert(rootObj != NULL);
     assert(strcmp(rootObj->key, "project") == 0);
     assert(rootObj->val->kind == JSON_VAL_OBJECT);
 
-    json_object* projectObj = rootObj->val->v.t_object;
+    json_object* projectObj = rootObj->val->v_object;
     assert(projectObj != NULL);
     assert(strcmp(projectObj->key, "name") == 0);
     assert(projectObj->val->kind == JSON_VAL_STRING);
-    assert(strcmp(projectObj->val->v.t_string, "thule-json") == 0);
+    assert(strcmp(projectObj->val->v_string, "thule-json") == 0);
     assert(projectObj->next != NULL);
     assert(projectObj->prev == NULL);
 
@@ -193,12 +193,12 @@ void test_object_with_array() {
     assert(projectObj->next == NULL);
     assert(projectObj->prev != NULL);
 
-    json_array* languages = projectObj->val->v.t_array;
+    json_array* languages = projectObj->val->v_array;
     assert(languages->length == 2);
     assert(languages->items[0]->kind == JSON_VAL_STRING);
-    assert(strcmp(languages->items[0]->v.t_string, "C") == 0);
+    assert(strcmp(languages->items[0]->v_string, "C") == 0);
     assert(languages->items[1]->kind == JSON_VAL_STRING);
-    assert(strcmp(languages->items[1]->v.t_string, "Makefile") == 0);
+    assert(strcmp(languages->items[1]->v_string, "Makefile") == 0);
 
     json_value_free(root);
 }
@@ -209,16 +209,16 @@ void test_array_of_objects() {
     assert(root != NULL);
     assert(root->kind == JSON_VAL_ARRAY);
 
-    json_array* arr = root->v.t_array;
+    json_array* arr = root->v_array;
     assert(arr->length == 3);
 
     char* names[] = {"thule-json", "qr-asm", "bootjack"};
     for (int i = 0; i < 3; i++) {
-        json_object* project = arr->items[i]->v.t_object;
+        json_object* project = arr->items[i]->v_object;
         assert(arr->items[i]->kind == JSON_VAL_OBJECT);
         assert(strcmp(project->key, "name") == 0);
         assert(project->val->kind == JSON_VAL_STRING);
-        assert(strcmp(project->val->v.t_string, names[i]) == 0);
+        assert(strcmp(project->val->v_string, names[i]) == 0);
     }
     json_value_free(root);
 }
@@ -229,57 +229,80 @@ void test_complex() {
     assert(root != NULL);
     assert(root->kind == JSON_VAL_OBJECT);
 
-    json_object* rootObj = root->v.t_object;
+    json_object* rootObj = root->v_object;
     assert(rootObj != NULL);
     assert(strcmp(rootObj->key, "profile") == 0);
     assert(rootObj->val->kind == JSON_VAL_OBJECT);
 
-    json_object* profile = rootObj->val->v.t_object;
+    json_object* profile = rootObj->val->v_object;
     assert(profile != NULL);
     assert(strcmp(profile->key, "username") == 0);
-    assert(strcmp(profile->val->v.t_string, "barrettotte") == 0);
+    assert(strcmp(profile->val->v_string, "barrettotte") == 0);
 
     rootObj = rootObj->next;
     assert(rootObj != NULL);
     assert(strcmp(rootObj->key, "projects") == 0);
     assert(rootObj->val->kind == JSON_VAL_ARRAY);
 
-    json_array* projects = rootObj->val->v.t_array;
+    json_array* projects = rootObj->val->v_array;
     assert(projects->length == 2);
 
     // first project
-    json_object* project = projects->items[0]->v.t_object;
+    json_object* project = projects->items[0]->v_object;
     assert(projects->items[0]->kind == JSON_VAL_OBJECT);
     assert(project != NULL);
     assert(strcmp(project->key, "name") == 0);
     assert(project->val->kind == JSON_VAL_STRING);
-    assert(strcmp(project->val->v.t_string, "thule-json") == 0);
+    assert(strcmp(project->val->v_string, "thule-json") == 0);
     project = project->next;
     assert(strcmp(project->key, "languages") == 0);
     assert(project->val->kind == JSON_VAL_ARRAY);
 
-    json_array* languages = project->val->v.t_array;
+    json_array* languages = project->val->v_array;
     assert(languages->length == 2);
     assert(languages->items[0]->kind == JSON_VAL_STRING);
-    assert(strcmp(languages->items[0]->v.t_string, "C") == 0);
+    assert(strcmp(languages->items[0]->v_string, "C") == 0);
     assert(languages->items[1]->kind == JSON_VAL_STRING);
-    assert(strcmp(languages->items[1]->v.t_string, "Makefile") == 0);
+    assert(strcmp(languages->items[1]->v_string, "Makefile") == 0);
 
     // second project
-    project = projects->items[1]->v.t_object;
+    project = projects->items[1]->v_object;
     assert(projects->items[1]->kind == JSON_VAL_OBJECT);
     assert(project != NULL);
     assert(strcmp(project->key, "name") == 0);
     assert(project->val->kind == JSON_VAL_STRING);
-    assert(strcmp(project->val->v.t_string, "qr-asm") == 0);
+    assert(strcmp(project->val->v_string, "qr-asm") == 0);
     project = project->next;
     assert(strcmp(project->key, "languages") == 0);
     assert(project->val->kind == JSON_VAL_ARRAY);
 
-    languages = project->val->v.t_array;
+    languages = project->val->v_array;
     assert(languages->length == 1);
     assert(languages->items[0]->kind == JSON_VAL_STRING);
-    assert(strcmp(languages->items[0]->v.t_string, "Assembly") == 0);
+    assert(strcmp(languages->items[0]->v_string, "Assembly") == 0);
+
+    json_value_free(root);
+}
+
+void test_readme_1() {
+    const char* src = "{\"username\": \"barrettotte\"}";
+    json_value* root = json_parse(src);
+    json_object* obj = root->v_object;
+
+    printf("username => %s\n", obj->val->v_string);
+    // username => barrettotte
+
+    json_value_free(root);
+}
+
+void test_readme_2() {
+    const char* src = "{\"profile\":{\"username\":\"barrettotte\"},\"projects\":[{\"name\":\"thule-json\",\"languages\":[\"C\",\"Makefile\"]},{\"name\":\"qr-asm\",\"languages\":[\"Assembly\"]}]}";
+    json_value* root = json_parse(src);
+    json_object* projects = root->v_object->next;                           // projects[]
+    json_object* thule = projects->val->v_array->items[0]->v_object->next;  // projects[0]
+
+    printf("projects[0].languages[0] => %s\n", thule->val->v_array->items[0]->v_string);
+    // projects[0].languages[0] => C
 
     json_value_free(root);
 }
