@@ -8,13 +8,48 @@ For a toy JSON parser, that's good enough for me.
 ## Usage
 
 ```c
+// trivial example
 #include "thule.h"
 
+int main() {
+    const char* src = "{\"username\": \"barrettotte\"}";
+    json_value* root = json_parse(src);
+    json_object* obj = root->v.t_object;
+
+    printf("username => %s\n", obj->val->v.t_string);
+    // username => barrettotte
+
+    json_value_free(root);
+
+    return 0;
+}
 ```
+
+```C
+// slightly more complex example
+#include "thule.h"
+
+int main() {
+    const char* src = "{\"profile\":{\"username\":\"barrettotte\"},\"projects\":[{\"name\":\"thule-json\",\"languages\":[\"C\",\"Makefile\"]},{\"name\":\"qr-asm\",\"languages\":[\"Assembly\"]}]}";
+    json_value* root = json_parse(src);
+    json_object* projects = root->v.t_object->next;                             // projects[]
+    json_object* thule = projects->val->v.t_array->items[0]->v.t_object->next;  // projects[0]
+
+    printf("projects[0].languages[0] => %s\n", thule->val->v.t_array->items[0]->v.t_string);
+    // projects[0].languages[0] => C
+
+    json_value_free(root);
+    
+    return 0;
+}
+```
+
+TODO: more complex example (multi-level and type)
 
 ### Running Tests
 
-- `make; ./thule_test`
+- normal - `make`
+- with memory leak check - `make valgrind`
 
 ## References
 

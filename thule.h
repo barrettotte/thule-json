@@ -26,7 +26,7 @@ typedef struct json_array json_array;
 typedef struct json_object json_object;
 
 struct json_array {
-    json_value* items;
+    json_value** items;
     size_t length;
     size_t capacity;
 };
@@ -41,13 +41,13 @@ struct json_object {
 struct json_value {
     json_val_kind kind;
     union {
-        char*        v_string;
-        long         v_int;
-        double       v_double;
-        bool         v_bool;
-        json_array*  v_array;
-        json_object* v_object;
-    };
+        char*        t_string;
+        long         t_int;
+        double       t_double;
+        bool         t_bool;
+        json_array*  t_array;
+        json_object* t_object;
+    } v;
 };
 
 json_value* json_parse(const char* src);
