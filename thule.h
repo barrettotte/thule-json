@@ -47,10 +47,8 @@ struct json_value {
         bool         v_bool;
         json_array*  v_array;
         json_object* v_object;
-    } val;
+    };
 };
-
-/* functions */
 
 json_value* json_parse(const char* src);
 void json_value_free(json_value* node);

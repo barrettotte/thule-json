@@ -190,8 +190,8 @@ static void parser_init(json_parser* parser, const char* src) {
 
 // parse numeric literal
 static char* parse_number(json_parser* parser) {
-    size_t len = parser->curr_token.length + 1;
-    char* i = (char*) malloc(sizeof(char) * len);
+    size_t len = parser->curr_token.length;
+    char* i = malloc(sizeof(char) * len + 1);
     i[len] = '\0';
     memcpy(i, parser->curr_token.start, len);
     return i;
@@ -216,53 +216,54 @@ static double parse_double(json_parser* parser) {
 // parse string literal
 static char* parse_string(json_parser* parser) {
     size_t len = parser->curr_token.length - 2;
-    char* s = (char*) malloc(sizeof(char) * len);
+    char* s = malloc(sizeof(char) * len + 1);
     memcpy(s, parser->curr_token.start + 1, len);
+    s[len] = '\0';
     return s;
 }
 
 // parse a JSON node
 static json_value* parse_val(json_parser* parser) {
-    json_value* node = (json_value*) malloc(sizeof(json_value));
+    json_value* node = malloc(sizeof(json_value));
     node->kind = JSON_VAL_UNINIT;
 
     consume(parser);
     switch(parser->curr_token.kind) {
         case JSON_TOK_LSQBRACE:
             node->kind = JSON_VAL_ARRAY;
-            node->val.v_array = parse_array(parser);
+            node->v_array = parse_array(parser);
             break;
         case JSON_TOK_LBRACKET:
             node->kind = JSON_VAL_OBJECT;
-            node->val.v_object = parse_object(parser);
+            node->v_object = parse_object(parser);
             break;
         case JSON_TOK_INT:
             node->kind = JSON_VAL_INT;
-            node->val.v_int = parse_integer(parser);
+            node->v_int = parse_integer(parser);
             break;
         case JSON_TOK_DOUBLE:
             node->kind = JSON_VAL_DOUBLE;
-            node->val.v_double = parse_double(parser);
+            node->v_double = parse_double(parser);
             break;
         case JSON_TOK_STRING:
             node->kind = JSON_VAL_STRING;
-            node->val.v_string = parse_string(parser);
+            node->v_string = parse_string(parser);
             break;
         case JSON_TOK_TRUE:
             node->kind = JSON_VAL_BOOL;
-            node->val.v_bool = true;
+            node->v_bool = true;
             break;
         case JSON_TOK_FALSE:
             node->kind = JSON_VAL_BOOL;
-            node->val.v_bool = false;
+            node->v_bool = false;
             break;
         case JSON_TOK_NULL:
             node->kind = JSON_VAL_NULL;
-            node->val.v_int = 0;
+            node->v_int = 0;
             break;
         default:
             node->kind = JSON_VAL_ERROR;
-            node->val.v_int = JSON_ERR_BADTOKEN;
+            node->v_int = JSON_ERR_BADTOKEN;
             break;
     }
     return node;
@@ -270,10 +271,10 @@ static json_value* parse_val(json_parser* parser) {
 
 // parse JSON array
 static json_array* parse_array(json_parser* parser) {
-    json_array* arr = (json_array*) malloc(sizeof(json_array));
+    json_array* arr = malloc(sizeof(json_array));
     arr->capacity = 8;
     arr->length = 0;
-    arr->items = (json_value*) malloc(sizeof(json_value) * arr->capacity);
+    arr->items = malloc(sizeof(json_value) * arr->capacity);
 
     // init nodes
     for (size_t i = 0; i < arr->capacity; i++) {
@@ -304,22 +305,26 @@ static json_array* parse_array(json_parser* parser) {
     return arr;
 }
 
+// allocate a new JSON object node
+static json_object* new_object() {
+    json_object* obj = malloc(sizeof(json_object));
+    obj->key = NULL;
+    obj->next = NULL;
+    obj->prev = NULL;
+    obj->val = NULL;
+    return obj;
+}
+
 // parse JSON object
 static json_object* parse_object(json_parser* parser) {
-    json_object* head = (json_object*) malloc(sizeof(json_object));
-    head->key = NULL;
-    head->next = NULL;
-    head->prev = NULL;
-    head->val = (json_value*) malloc(sizeof(json_value));
-    head->val->kind = JSON_VAL_UNINIT;
-
+    json_object* head = new_object();
     json_object* prev = NULL;
     json_object* curr = head;
 
     while (!parser->eof && parser->next_token.kind != JSON_TOK_RBRACKET) {
-        asserted_consume(parser, JSON_TOK_STRING);  // key start
+        asserted_consume(parser, JSON_TOK_STRING); // key start
         curr->key = parse_string(parser);
-        asserted_consume(parser, JSON_TOK_COLON);   // key end
+        asserted_consume(parser, JSON_TOK_COLON);  // key end
 
         curr->val = parse_val(parser);
         curr->prev = prev;
@@ -330,12 +335,10 @@ static json_object* parse_object(json_parser* parser) {
         }
         // next field
         asserted_consume(parser, JSON_TOK_COMMA);
-        curr->next = (json_object*) malloc(sizeof(json_object));
-        curr->next->next = NULL;
-        curr->next->prev = NULL;
+        curr->next = new_object();
         curr = curr->next;
     }
-    free(curr->next);
+    // free(curr->next);
     asserted_consume(parser, JSON_TOK_RBRACKET);
     return head;
 }
@@ -352,20 +355,28 @@ json_value* json_parse(const char* src) {
 // deallocate JSON node's heap memory
 void json_value_free(json_value* node) {
     if (node->kind == JSON_VAL_ARRAY) {
-        json_array* arr = node->val.v_array;
+        json_array* arr = node->v_array;
         for (size_t i = 0; i < arr->length; i++) {
             json_value_free(&arr->items[i]);
         }
-        free(node->val.v_array);
+        free(node->v_array);
     } else if (node->kind == JSON_VAL_OBJECT) {
-        json_object* obj = node->val.v_object;
+        json_object* obj = node->v_object;
+
+        printf("freeing %s...\n", obj->key);
+
         while (obj != NULL) {
-            json_value_free(obj->val);
+            if (obj->key != NULL) {
+                free(obj->key);
+            }
+            if (obj->val != NULL) {
+                json_value_free(obj->val);
+            }
             obj = obj->next;
         }
-        free(node->val.v_object);
+        free(node->v_object);
     } else if (node->kind == JSON_VAL_STRING) {
-        free(node->val.v_string);
+        free(node->v_string);
     }
     free(node);
 }
@@ -374,11 +385,11 @@ void json_value_free(json_value* node) {
 void json_value_print(json_value* node) {
     switch (node->kind) {
         case JSON_VAL_OBJECT: printf("Object{}"); break;
-        case JSON_VAL_ARRAY:  printf("Array[%zu]", node->val.v_array->length); break;
-        case JSON_VAL_STRING: printf("\"%s\"", node->val.v_string); break;
-        case JSON_VAL_INT:    printf("%ld", node->val.v_int); break;
-        case JSON_VAL_DOUBLE: printf("%f", node->val.v_double); break;
-        case JSON_VAL_BOOL:   printf("%s", node->val.v_bool ? "true" : "false"); break;
+        case JSON_VAL_ARRAY:  printf("Array[%zu]", node->v_array->length); break;
+        case JSON_VAL_STRING: printf("\"%s\"", node->v_string); break;
+        case JSON_VAL_INT:    printf("%ld", node->v_int); break;
+        case JSON_VAL_DOUBLE: printf("%f", node->v_double); break;
+        case JSON_VAL_BOOL:   printf("%s", node->v_bool ? "true" : "false"); break;
         case JSON_VAL_NULL:   printf("null"); break;
         default:              printf("unknown JSON value"); break;
     }
